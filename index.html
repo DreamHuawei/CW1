@@ -11,26 +11,31 @@
 </head>
  
 <body>
-    <div id="app">
-    <header>
-        <div id="navbarChange" class="navbar navbar-default" style="background-color:blanchedalmond;">
-          <div class="navbar-nav">
-            <h1>Happy Store</h1>
-          </div>
-          <div class="nav navbar-nav navbar-right cart" style="padding-right: 70px;" >
-            <button id="btn1" type="button" class="btn btn-default" v-on:click="showCheckout">
-              <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
-            </button>
-            <div class="searchBox" style="margin-top: 10px;">
-                <form action="/search" method="get">
-                    <input type="search"  placeholder="Search">
-                    <input type="submit" class="btn btn-default" value="Search">
-                </form>
+    <div class="range">
+        <div id="app">
+        <header>
+            <div class="navbar navbar-default" style=" background-color: bisque;">
+                <div class="navbar-header ">
+                    <h1>{{ sitename }}</h1>
+                </div>
+                                
+                <div class="nav navbar-nav navbar-right cart">
+                    <button type="button" class="btn btn-default btn-lg" v-on:click="showCheckout">
+                        <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
+                    </button>
+                    <div class="searchBox" style="margin-top: 10px;">
+                        <form action="/search" method="get">
+                            <input type="search"  placeholder="Search box">
+                            <input type="submit" class="btn btn-default" value="Search">
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-default" v-on:click="">Selection 1</button>
+                    <button type="button" class="btn btn-danger" >Selection 2</button>
+                </div>
             </div>
-              
-          </div>
-        </div>
-    </header>
+        </header>
     <main>
         <div class="row product">
           <div v-if="showProduct">
@@ -39,7 +44,7 @@
               <figure>
                 <img :src="product.image">
               </figure>
-            </div> <!--管理产品的图像-->
+            </div>
 
             <div class="col-md-6 col-md-offset-2 description">
               <h1 v-text="product.title"></h1>
@@ -71,7 +76,7 @@
         var webstore = new Vue({
           el: '#app',
           data: {
-            sitename: "Vue.js Pet Depot",
+            sitename: "Happy Store",
             showProduct: true,
             product: {
               id: 1001,
