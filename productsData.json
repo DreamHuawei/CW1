@@ -4,17 +4,19 @@
         "id": 1001,
         "title": "Cat",
         "description": "This is a cute stuffed cat.",
-        "price": 2000,
-        "image": "",
-        "availableInventory": 8
+        "price": 199,
+        "image": "Images/cat.png",
+        "availableInventory": 10,
+        "rating": 1
       },
       {
         "id": 1002,
         "title": "Dog",
         "description": "This is a cute stuffed dog.",
         "price": 299,
-        "image": "",
-        "availableInventory": 7
+        "image": "Images/cat.png",
+        "availableInventory": 7,
+        "rating": 3
       }
     ]
   }
