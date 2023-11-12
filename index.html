@@ -19,7 +19,7 @@
                 </div>
                                 
                 <div class="nav navbar-nav navbar-right cart">
-                    <button type="button" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;">
+                    <button type="button" v-model="showCart" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;" >
                         <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
                     </button>
                     <div class="searchBox">
@@ -50,7 +50,7 @@
                     <p v-html="product.location"></p>
                     <p class="price">{{product.price | formatPrice}}</p>
                     <button class=" btn btn-primary btn-lg" v-on:click="addToCart(product)" v-if="canAddToCart(product)">
-                        Add to 
+                        Add to cart
                     </button>
                     <button disabled="true" class=" btn btn-primary btn-lg" v-else>
                         Add to cart
@@ -71,13 +71,9 @@
                         </span>
                     </div>
                 </div>
-                <!-- end of col-md-6-->
                 </div>
-                <!-- end of row-->
             </div>
-            <!-- end of v-for-->
             </div>
-            <!-- end of showProduct-->
             <div v-else>
             <div class="row">
                 <div class="col-md-10 col-md-offset-1">
@@ -201,14 +197,12 @@
             },
         },
 
-        //计算商品被添加进购物车的数量
-        //计算商品可以被加入购物车的数量
         computed: {
             cartItemCount() {
-                if(this.cart.length === ""){
-                    
+                if(this.showCart ===""){
+                    return this.showCart
                 }
-            return this.cart.length || '';
+                return this.cart.length || '';
             },
             sortedProducts() {
             if (this.products.length > 0) {
