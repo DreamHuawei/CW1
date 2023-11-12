@@ -19,25 +19,26 @@
                 </div>
                                 
                 <div class="nav navbar-nav navbar-right cart">
-                    <button type="button" class="btn btn-default btn-lg" v-on:click="showCheckout">
+                    <button type="button" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;">
                         <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
                     </button>
-                    <div class="searchBox" style="margin-top: 10px;">
-                        <form action="/search" method="get">
-                            <input type="search"  placeholder="Search box">
-                            <input type="submit" class="btn btn-default" value="Search">
-                        </form>
+                    <div class="searchBox">
+                        <input type="text" v-model="searchContent"  placeholder="Search box">
                     </div>
                 </div>
-                <div>
-                    <button type="button" class="btn btn-default" v-on:click="">Selection 1</button>
-                    <button type="button" class="btn btn-danger" >Selection 2</button>
-                </div>
+                <div class="sort">
+                        <div class="col-md-8 boxes">
+                            <input type="radio" name="sort" value="asc" v-model="priceSort" >
+                            <label >priceAsc</label>
+                            <input type="radio" name="sort" value="desc" v-model="priceSort" >
+                            <label >priceDesc</label>
+                        </div>
+                    </div>
             </div>
         </header>
         <main>
             <div v-if="showProduct" class="restrict">
-            <div v-for="product in sortedProducts" style="width: 33.33%; ">
+            <div v-for="product in sortedProducts" style="width: 33.33%;">
                 <div >
                 <div style="float: left; margin-right: 10px;">
                     <figure>
@@ -45,8 +46,8 @@
                     </figure>
                 </div>
                 <div class="description">
-                    <h1 v-text="product.title" ></h1>
-                    <p v-html="product.description"></p>
+                    <h1 v-text="product.title" style="font-size: 25px; font-weight: bold;"></h1>
+                    <p v-html="product.location"></p>
                     <p class="price">{{product.price | formatPrice}}</p>
                     <button class=" btn btn-primary btn-lg" v-on:click="addToCart(product)" v-if="canAddToCart(product)">
                         Add to 
@@ -102,70 +103,19 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-12">
-                            <strong>Address:</strong>
+                            <strong>Phone number:</strong>
                             </div>
                             <div class="col-md-12">
-                            <input v-model.trim="order.address" class="form-control" />
+                            <input v-model.trim="order.number" class="form-control" />
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-md-12">
-                            <strong>City:</strong>
-                            </div>
-                            <div class="col-md-12">
-                            <input v-model.trim="order.city" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-2">
-                            <strong>State:</strong>
-                            <select v-model="order.state" class="form-control">
-                                <option disabled value="">State</option>
-                                <option v-for="(state, key) in states" v-bind:value="state">
-                                {{key}}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-6 col-md-offset-4">
-                            <strong>Zip / Postal Code:</strong>
-                            <input v-model.number="order.zip" class="form-control" type="number" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-md-6 boxes">
-                            <input type="checkbox" id="gift" value="true" v-bind:true-value="order.sendGift" v-bind:false-value="order.dontSendGift" v-model="order.gift">
-                            <label for="gift">Ship As Gift?</label>
-                        </div>
-                    </div>
-                    <!-- end of form-group -->
-                    <div class="form-group">
-                        <div class="col-md-6 boxes">
-                            <input type="radio" id="home" v-bind:value="order.home" v-model="order.method">
-                            <label for="home">Home</label>
-                            <input type="radio" id="business" v-bind:value="order.business" v-model="order.method">
-                            <label for="business">Business</label>
-                        </div>
-                    </div>
-                    <!-- end of form-group-->
-                    <div class="form-group">
-                        <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary submit" v-on:click="submitForm">Place Order</button>
-                        </div>00
-                        <!-- end of col-md-6-->
-                    </div>
-                    <!-- end of form-group-->
+                    
                     <div class="col-md-12 verify">
                         <pre>
                             First Name: {{order.firstName}}
                             Last Name: {{order.lastName}}
-                            Address: {{order.address}}
-                            City: {{order.city}}
-                            Zip: {{order.zip}}
-                            State: {{order.state}}
-                            Method: {{order.method}}
-                            Gift: {{order.gift}}
+                            Phone number: {{order.number}}
+
                         </pre>
                     </div>
                     <!-- end of col-md-12 verify-->
@@ -186,11 +136,13 @@
     </div>
 
     <script type="text/javascript">
+        const nameRegex = /^[a-zA-Z]+$/;
+        const phoneRegex = /^[0-9]+$/;
         var APP_LOG_LIFECYCLE_EVENTS = true;
         var webstore = new Vue({
         el: '#app',
         data: {
-            sitename: "Happy Store",
+            sitename: "Course Selection System",
             showProduct: true,
             a: false,
             states: {
@@ -201,40 +153,39 @@
             NV: 'Nevada'
             },
             order: {
-            firstName: '',
-            lastName: '',
-            address: '',
-            city: '',
-            zip: '',
-            state: '',
-            method: 'Home Address',
-            business: 'Business Address',
-            home: 'Home Address',
-            gift: '',
-            sendGift: 'Send As A Gift',
-            dontSendGift: 'Do Not Send As A Gift'
+              firstName: '',
+              lastName: '',
+              number: '',
             },
             products: {},
-            cart: []
+            cart: [],
+            priceSort: "asc",
+            searchContent: "",
             
         },
+        
 
         methods: {
             checkRating(n, myProduct) {
             return myProduct.rating - n >= 0;
             },
+            
             addToCart(aProduct) {
             this.cart.push(aProduct.id);
             },
+
             showCheckout() {
             this.showProduct = this.showProduct ? false : true;
             },
+
             submitForm() {
             alert('Submitted');
             },
+
             canAddToCart(aProduct) {
             return aProduct.availableInventory > this.cartCount(aProduct.id);
             },
+
             cartCount(id) {
             let count = 0;
             for (var i = 0; i < this.cart.length; i++) {
@@ -243,13 +194,20 @@
                 }
             }
             return count;
-            }
+            },
+            
+            checkInput(firstName, lastName, number) {
+                return name.match(nameRegex) && phone.match(phoneRegex);
+            },
         },
 
         //计算商品被添加进购物车的数量
         //计算商品可以被加入购物车的数量
         computed: {
             cartItemCount() {
+                if(this.cart.length === ""){
+                    
+                }
             return this.cart.length || '';
             },
             sortedProducts() {
@@ -257,6 +215,15 @@
                 let productsArray = this.products.slice(0);
                 console.log(productsArray);
                 console.log(this.products);
+                if(this.searchContent !== ""){
+                    productsArray = productsArray.filter(product=>product.title.toLowerCase().includes(this.searchContent.toLowerCase()))
+                }
+                    if(this.priceSort === "asc"){
+                    return productsArray.sort(compare);
+                } else {
+                    return productsArray.sort(compareDesc);
+                }
+        
                 function compare(a, b) {
                 if (a.title.toLowerCase() < b.title.toLowerCase())
                     return -1;
@@ -264,10 +231,21 @@
                     return 1;
                 return 0;
                 }
-                return productsArray.sort(compare);
+                function compareDesc(a, b) {
+                if (a.title.toLowerCase() < b.title.toLowerCase())
+                    return 1;
+                if (a.title.toLowerCase() > b.title.toLowerCase())
+                    return -1;
+                return 0;
+                }
             }
-            }
+
+            },
+            checkInput(firstName, lastName, number) {
+                return name.match(nameRegex) && phone.match(phoneRegex);
+            },
         },
+        
 
         //价格计算规则开始
         filters: {
