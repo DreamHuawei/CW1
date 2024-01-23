@@ -19,12 +19,14 @@
                 </div>
                                 
                 <div class="nav navbar-nav navbar-right cart">
-                    <button type="button" v-model="showCart" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;" v-if="">
+                    <button type="button" v-model="showCart" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;" v-if="cart.length > 0">
                         <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
                     </button>
-                    <button disabled="true" type="button" class="btn btn-default btn-lg" style="position: relative;  left: 27%;" v-else>
+                    
+                    <button disabled="true" title="Please add at least one item!" type="button" class="btn btn-default btn-lg" style="position: relative;  left: 27%;" v-else>
                         <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
                     </button>
+
                     <div class="searchBox">
                         <input type="text" v-model="searchContent"  placeholder="Search box">
                     </div>
@@ -78,6 +80,9 @@
             </div>
             </div>
             <div v-else>
+                <div>
+                    
+                </div>
             <div class="row">
                 <div class="col-md-5 col-md-offset-7">
                 <div class="panel panel-info">
@@ -153,6 +158,7 @@
               lastName: '',
               number: '',
             },
+            
             products: {},
             cart: [],
             titleSort: "asc",
@@ -188,7 +194,6 @@
             canAddToCart(aProduct) {
             return aProduct.availableInventory > this.cartCount(aProduct.id);
             },
-
 
             showCheckout() {
             this.showProduct = this.showProduct ? false : true;
@@ -245,9 +250,6 @@
 
             },
 
-            // checkInput(firstName, lastName, number) {
-            //     return name.match(nameRegex) && phone.match(phoneRegex);
-            // },
         },
         
 
