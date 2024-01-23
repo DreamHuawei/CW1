@@ -121,7 +121,7 @@
                     <div class="form-group submitCourse">
                         <div class="col-md-3">
                             <button disabled="true" class="" v-if="isSubmitDisabled">Submit</button>
-                            <button class="" v-on:click="submitForm" v-else>Submit</button>
+                            <button class="" v-on:click="validateAndSubmit" v-else>Submit</button>
                         </div>
                     </div> 
                     <!-- end of col-md-12 verify-->
@@ -194,18 +194,16 @@
             this.showProduct = this.showProduct ? false : true;
             },
 
-            submitForm() {
-            alert('Submit Successfully');
+            validateAndSubmit: function() {
+            var nameRegex = /^[A-Za-z]+$/;
+            var numberRegex = /^[0-9]+$/;
+            if (!nameRegex.test(this.order.firstName) || !nameRegex.test(this.order.lastName) || !numberRegex.test(this.order.number)) {
+                alert('Please check the format you entered. \r\rTip: The First and Last names should be letters. \r       The Phone number must be a number.');
+            } 
+            else {
+                alert('Submit Successfully');
+            }
             },
-
-            // checkInput(firstName, lastName, number) {
-            //     const nameRegex = /^[a-zA-Z]+$/;
-            //     const phoneRegex = /^[0-9]+$/;
-            //     if(this.firstName !=nameRegex){
-
-            //     }
-            //     return firstName.match(nameRegex) && lastName.match(nameRegex) && number.match(phoneRegex);
-            // },
         },
 
         computed: {
