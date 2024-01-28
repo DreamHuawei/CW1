@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <script src="https://unpkg.com/vue@2"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/css.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.js"></script>
     <title>Mobile App</title>
@@ -13,13 +14,13 @@
     <div class="range">
         <div id="app">
         <header>
-            <div class="navbar navbar-default" style=" background-color: bisque;">
+            <div v-if="showHead" class="navbar navbar-default" style=" background-color: bisque;">
                 <div class="navbar-header ">
                     <h1>{{ sitename }}</h1>
                 </div>
                                 
                 <div class="nav navbar-nav navbar-right cart">
-                    <button type="button" v-model="showCart" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;" v-if="cart.length > 0">
+                    <button type="button" class="btn btn-default btn-lg" v-on:click="showCheckout" style="position: relative;  left: 27%;" v-if="cart.length > 0">
                         <span class="glyphicon glyphicon-shopping-cart">{{ cartItemCount}}</span> Checkout
                     </button>
                     
@@ -28,10 +29,10 @@
                     </button>
 
                     <div class="searchBox">
-                        <input type="text" v-model="searchContent"  placeholder="Search box">
+                        <input type="text" v-model="searchContent"  placeholder="Search Box">
                     </div>
                 </div>
-                <div class="sort">
+                <div v-if="showSort" class="sort">
                     <div class="col-md-8 boxes">
                         <input type="radio" name="sort" value="asc" v-model="titleSort" >
                         <label >titleAsc</label>
@@ -42,12 +43,49 @@
             </div>
         </header>
         <main>
+
+            <div v-if="searchProduct" class="restrict">
+                <div v-for="product in productList" style="width: 33.33%;">
+                    <div style="float: left; margin-right: 10px;">
+                        <figure>
+                            <img class="product" v-bind:src="[apiPre+product.image]">
+                        </figure>
+                    </div>
+                    <div class="description">
+                        <h1 v-text="product.title" style="font-size: 25px; font-weight: bold;"></h1>
+                        <p v-html="product.location"></p>
+                        <p class="price">{{product.price | formatPrice}}</p>
+                        <button class=" btn btn-primary btn-lg" v-on:click="addToCart(product)" v-if="canAddToCart(product)">
+                            Add to cart
+                        </button>
+                        <button disabled="true" class=" btn btn-primary btn-lg" v-else>
+                            Add to cart
+                        </button>
+                        <span class="inventory-message" v-if="product.availableInventory - cartCount(product.id) === 0">
+                            All Out!
+                        </span>
+                        <span class="inventory-message" v-else-if="product.availableInventory - cartCount(product.id) < 5">
+                            Only {{product.availableInventory - cartCount(product.id)}} left!
+                        </span>
+                        <span class="inventory-message" v-else>
+                            Buy Now!
+                        </span>
+                        
+                        <div class="rating">
+                            <span v-bind:class="{'rating-active' :checkRating(n, product)}" v-for="n in 5">
+                                ☆
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div v-if="showProduct" class="restrict">
             <div v-for="product in sortedProducts" style="width: 33.33%;">
                 <div >
                 <div style="float: left; margin-right: 10px;">
                     <figure>
-                        <img class="product" v-bind:src="product.image">
+                        <img class="product" v-bind:src="[apiPre+product.image]">
                     </figure>
                 </div>
                 <div class="description">
@@ -79,19 +117,49 @@
                 </div>
             </div>
             </div>
-            <div v-else>
-                <div>
-                    
-                </div>
-            <div class="row">
-                <div class="col-md-5 col-md-offset-7">
+            <div v-if="showTable">
+            <div class=" btn btn-primary btn-sm" v-on:click="home">HOME</div>
+                <div class="row restrict">
+                    <div v-for="product in datas" style="width: 33.33%;">
+                        <div >
+                        <div style="float: left; margin-right: 10px;">
+                            <figure>
+                                <img class="product" v-bind:src="[apiPre+product.image]">
+                            </figure>
+                        </div>
+                        <div class="description">
+                            <h1 v-text="product.title" style="font-size: 25px; font-weight: bold;"></h1>
+                            <p v-html="product.location"></p>
+                            <p class="price">{{product.price | formatPrice}}</p>
+                            <button class=" btn btn-primary btn-lg" v-on:click="remove(product)">
+                                Remove
+                            </button>
+                            <span class="inventory-message" v-if="product.availableInventory - cartCount(product.id) === 0">
+                                All Out!
+                            </span>
+                            <span class="inventory-message" v-else-if="product.availableInventory - cartCount(product.id) < 5">
+                                Only {{product.availableInventory - cartCount(product.id)}} left!
+                            </span>
+                            
+                            <div class="rating">
+                                <span v-bind:class="{'rating-active' :checkRating(n, product)}" v-for="n in 5">
+                                    ☆
+                                </span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+    
+                </div>   
+            <div class="row" >
+                <div class="col-md-10 col-md-offset-1"  style="margin-top: 5%;">                    
                 <div class="panel panel-info">
                     <div class="panel-heading">Course Checkout</div>
                     <div class="panel-body">
                     <div class="form-group">
                         <div class="col-md-12">
                         <h4>
-                            <strong>Enter Your Information</strong>
+                            <strong>Complete Your Information</strong>
                         </h4>
                         </div>
                     </div>
@@ -125,8 +193,8 @@
 
                     <div class="form-group submitCourse">
                         <div class="col-md-3">
-                            <button disabled="true" class="" v-if="isSubmitDisabled">Submit</button>
-                            <button class="" v-on:click="validateAndSubmit" v-else>Submit</button>
+                            <button disabled="true" class="btn btn-primary btn-sm" v-if="isSubmitDisabled">Submit</button>
+                            <button class="btn btn-primary btn-sm" v-on:click="validateAndSubmit" v-else>Submit</button>
                         </div>
                     </div> 
                     <!-- end of col-md-12 verify-->
@@ -136,6 +204,7 @@
                 <!--end of panel panel-info-->
                 </div> 
                 <!--end of col-md-10 col-md-offset-1-->
+            </div>
             </div>
             <!--end of row-->
             </div>
@@ -152,15 +221,22 @@
         data: {
             sitename: "Course Selection System",
             showProduct: true,
+            showTable: false,
+            showHead: true,
+            showSort: true,
+            apiPre:"https://mapp-env.eba-3mn2p9xd.eu-north-1.elasticbeanstalk.com/",
             
             order: {
               firstName: '',
               lastName: '',
               number: '',
+              products:[]
             },
-            
+            searchProduct:false,
+            productList:[],
             products: {},
             cart: [],
+            datas: [],
             titleSort: "asc",
             searchContent: "",
             
@@ -180,23 +256,57 @@
             addToCart(aProduct) {
             this.cart.push(aProduct.id);
             },
+
+            getCart() {
+                this.datas = [];
+                for (var i = 0; i < this.cart.length; i++) {
+                    for (var j = 0; j < this.products.length; j++) {
+                        if (this.cart[i] === this.products[j].id) {
+                            this.datas.push(this.products[j]);
+                        }
+                    }
+                }
+            },
+            remove(product){
+                for (var i = 0; i < this.datas.length; i++) {
+                    if (this.datas[i].id == product.id) {
+                            this.datas.splice(i, 1);
+                    }
+                }
+                for (var i = 0; i < this.cart.length; i++) {
+                        if (this.cart[i] == product.id) {
+                                this.cart.splice(i, 1);
+                        }
+                }
+            },
             
             cartCount(id) {
-            let count = 0;
-            for (var i = 0; i < this.cart.length; i++) {
-                if (this.cart[i] === id) {
-                count++;
+                let count = 0;
+                for (var i = 0; i < this.cart.length; i++) {
+                    if (this.cart[i] === id) {
+                    count++;
+                    }
                 }
-            }
-            return count;
+                return count;
             },
             
             canAddToCart(aProduct) {
-            return aProduct.availableInventory > this.cartCount(aProduct.id);
+                return aProduct.availableInventory > this.cartCount(aProduct.id);
             },
 
             showCheckout() {
-            this.showProduct = this.showProduct ? false : true;
+            this.showProduct =  false;
+            this.showHead = false;
+            this.searchProduct = false;
+            this.showTable = true;
+            this.getCart();    
+
+            },
+            
+            home() {
+                // location.reload();
+                this.showProduct = true;
+                this.showHead = true;
             },
 
             validateAndSubmit: function() {
@@ -206,9 +316,85 @@
                 alert('Please check the format you entered. \r\rTip: The First and Last names should be letters. \r       The Phone number must be a number.');
             } 
             else {
-                alert('Submit Successfully');
+                this.order.products = this.datas;
+                fetch(this.apiPre + 'order', {
+                    method: 'post',
+                    body: JSON.stringify(this.order),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode:'cors'// 允许发送跨域请求
+                }).then(function(response){
+                    response.json().then(function(data){
+                        if(data.code == 1){
+                            // 清空购物车
+                            let ids = [];
+                            for (var i = 0; i < webstore.datas.length; i++) {
+                                ids.push(webstore.datas[i].id);
+                            }
+                            webstore.datas = [];
+                            // 刷新库存
+                            fetch(webstore.apiPre + 'num', {
+                                method: 'put',
+                                body: JSON.stringify({ids:ids}),
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                mode:'cors'// 允许发送跨域请求
+                            }).then(function(response){
+                                response.json().then(function(data){
+                                    if(data.code == 1){
+                                        alert('Submit Successfully');
+                                        // 刷新页面
+                                        location.reload();
+                                    }
+                                })
+
+                            });
+                        }
+                    })
+
+                });
             }
             },
+
+           initData: function(){
+                fetch(this.apiPre + 'lesson', {
+                    method: 'get',
+                    mode:'cors'// 允许发送跨域请求
+                }).then(function(response){
+                    response.json().then(function(data){
+                        webstore.products = data.data;
+                    })
+
+                });
+            },
+            
+        },
+
+        watch: {
+            'searchContent'(newVal, oldVal) {
+                console.log('oldVal:', oldVal)   
+                console.log('newVal:', newVal)
+                if(newVal){
+                    fetch(this.apiPre + 'search?keyWord=' + newVal, {
+                    method: 'get',
+                    mode:'cors'// 允许发送跨域请求
+                }).then(function(response){
+                    response.json().then(function(data){
+                        webstore.productList = data.data;
+                        webstore.searchProduct = true;
+                        webstore.showProduct = false;
+                        webstore.showTable = false;
+                        webstore.showSort = false;
+                    })
+
+                });
+                }else{
+                    location.reload();
+                }
+
+            }
         },
 
         computed: {
@@ -218,37 +404,38 @@
             cartItemCount() {
                 return this.cart.length || '';
             },
-            sortedProducts() {
-            if (this.products.length > 0) {
-                let productsArray = this.products.slice(0);
-                console.log(productsArray);
-                console.log(this.products);
-                if(this.searchContent !== ""){
-                    productsArray = productsArray.filter(product=>product.title.toLowerCase().includes(this.searchContent.toLowerCase()))
-                }
-                    if(this.titleSort === "asc"){
-                    return productsArray.sort(compare);
-                } else {
-                    return productsArray.sort(compareDesc);
-                }
-        
-                function compare(a, b) {
-                if (a.title.toLowerCase() < b.title.toLowerCase())
-                    return -1;
-                if (a.title.toLowerCase() > b.title.toLowerCase())
-                    return 1;
-                return 0;
-                }
-                function compareDesc(a, b) {
-                if (a.title.toLowerCase() < b.title.toLowerCase())
-                    return 1;
-                if (a.title.toLowerCase() > b.title.toLowerCase())
-                    return -1;
-                return 0;
-                }
-            }
 
-            },
+            sortedProducts() {
+                if (this.products.length > 0) {
+                    let productsArray = this.products.slice(0);
+                    console.log(productsArray);
+                    console.log(this.products);
+                    if(this.searchContent && this.searchContent !== ""){
+                        productsArray = productsArray.filter(product=>product.title.toLowerCase().includes(this.searchContent.toLowerCase()));
+                    }
+                    if(this.titleSort === "asc"){
+                        return  productsArray.sort(compare);
+                    } else {
+                        return productsArray.sort(compareDesc);
+                    }
+            
+                    function compare(a, b) {
+                    if (a.title.toLowerCase() < b.title.toLowerCase())
+                        return -1;
+                    if (a.title.toLowerCase() > b.title.toLowerCase())
+                        return 1;
+                    return 0;
+                    }
+                    function compareDesc(a, b) {
+                    if (a.title.toLowerCase() < b.title.toLowerCase())
+                        return 1;
+                    if (a.title.toLowerCase() > b.title.toLowerCase())
+                        return -1;
+                    return 0;
+                    }
+                }
+
+            }
 
         },
         
@@ -277,15 +464,11 @@
           //记录和控制app生命周期改变前后的事件
           beforeCreate: function () {	
             if (APP_LOG_LIFECYCLE_EVENTS) {	
-            console.log("beforeCreate");	
+                console.log("beforeCreate");	
             }
             },	
-            created: function () {	
-                axios.get('./productsData.json')
-                .then((response) => {
-                    this.products = response.data.products;
-                    console.log(this.products);
-                });
+            created: function () {
+                this.initData();
             },	
             beforeMount: function () {	
                 if (APP_LOG_LIFECYCLE_EVENTS) {	
